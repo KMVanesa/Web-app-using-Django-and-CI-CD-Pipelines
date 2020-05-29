@@ -73,13 +73,13 @@ WSGI_APPLICATION = 'DjangoApp1.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'MySQL',
-        'USER': 'root',
-        'PASSWORD': keys.MySqlPass(),
-        'HOST': 'localhost',
-        'PORT': '3306'
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "postgres",
+        "USER": "chief_kmv",
+        "PASSWORD": "Kmvanesa",
+        "HOST": "127.0.0.1",
+        "PORT": "5432",
     }
 }
 
