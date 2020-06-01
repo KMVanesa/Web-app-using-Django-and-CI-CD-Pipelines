@@ -1,6 +1,6 @@
 # web-app
 
-# Django App
+# Django App Project
 
 Django is based on MVT Model
 
