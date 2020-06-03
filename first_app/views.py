@@ -17,7 +17,7 @@ def index(request):
     #     # my_data = {'user': user.first_name}
     # # users = Register.objects.order_by('first_name')
 
-    return render(request, 'first_app/index.html', {})
+    return render(request, 'books/books.html', {})
 
 
 @login_required
@@ -61,7 +61,7 @@ def register_form(request):
             login(request, user)
 
             registered = True
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('books'))
 
         else:
             print(reg_form.errors)
@@ -96,18 +96,18 @@ def register_form(request):
 
 def user_login(request):
     if request.user.is_authenticated:
-        return render(request, 'first_app/index.html')
+        return HttpResponseRedirect(reverse('books'))
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return HttpResponseRedirect(reverse('index'))
+            return HttpResponseRedirect(reverse('books'))
         else:
             form = AuthenticationForm(request.POST)
-            msg = "Invalid Login Credentials"
-            return render(request, 'first_app/login.html', {'form': form, 'msg': msg})
+            messages.info(request, "Invalid Credentials.")
+            return render(request, 'first_app/login.html', {'form': form})
     else:
         form = AuthenticationForm()
         return render(request, 'first_app/login.html', {'form': form})
@@ -141,6 +141,7 @@ def change_password(request):
                 messages.success(request, "Your Password has been updated!")
                 return HttpResponseRedirect(reverse('logout'))
             else:
+                messages.info(request, "Passwords Don't Match.")
                 return render(request, 'first_app/password.html', {'form': form})
         else:
             form = PasswordChangeForm(user=request.user)
