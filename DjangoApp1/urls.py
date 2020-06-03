@@ -14,8 +14,10 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from first_app import views
+from products import views as product_view
+from products.views import ProductList, ProductDetailItem, ProductCreate, ProductUpdate, ProductDelete, MyBooksList
 from django.urls import include
 
 urlpatterns = [
@@ -27,5 +29,16 @@ urlpatterns = [
     path('update_profile/', views.profile, name="update"),
     path('first_app/', include('first_app.urls')),
     path('update_password/', views.change_password, name="password_change"),
-
+    # path('order-summary/', CartView.as_view(), name='order-summary'),
+    path('cart/', product_view.Cart, name='cart'),
+    path('add-to-cart/<int:pk>/', product_view.BookAddToCart, name='add-to-cart'),
+    path('remove-from-cart/<int:pk>/', product_view.RemoveAllBooks, name='remove-from-cart'),
+    path('remove-item-from-cart/<int:pk>/', product_view.BookRemoveFromCart,
+         name='remove-single-item-from-cart'),
+    path('books/', ProductList.as_view(), name="books"),
+    path('mybooks/', MyBooksList.as_view(), name="mybooks"),
+    path('books/<int:pk>/', ProductDetailItem.as_view(), name="book_item"),
+    path('books/new', ProductCreate.as_view(), name="book_new"),
+    path('books/<int:pk>/update/', ProductUpdate.as_view(), name="book_update"),
+    path('books/<int:pk>/delete/', ProductDelete.as_view(), name="book_delete"),
 ]

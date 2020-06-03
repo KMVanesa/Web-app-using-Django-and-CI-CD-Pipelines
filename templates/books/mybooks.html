@@ -1,0 +1,29 @@
+{% extends 'first_app/base.html' %}
+{% block body_block %}
+    <div class="row">
+        {% load bootstrap4 %}
+        {% for book in object_list %}
+            {% if book.seller == user %}
+                <div class="card col-md-4 " style="margin-bottom: 15px;">
+                    <div class="card-body">
+                        <h5 class="card-title">Title : <a href="{% url 'book_item' book.id %}">{{ book.title }}</a></h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Author : {{ book.authors }} </li>
+                            <li class="list-group-item">Price : ${{ book.price }}</li>
+                            <li class="list-group-item">Available Books: {{ book.quantity }}</li>
+                            <li class="list-group-item"><a href="{% url 'book_item' book.id %}"
+                                                           class="btn btn-primary">More Details</a></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer text-muted">
+                        Last Updated:
+                        {{ book.updation_date }}
+                    </div>
+                </div>
+            {% else %}
+                <h1>You haven't listed any books</h1>
+            {% endif %}
+
+        {% endfor %}
+    </div>
+{% endblock %}

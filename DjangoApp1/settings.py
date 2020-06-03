@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from . import keys
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -35,7 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'first_app'
+    'first_app',
+    'products',
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [
@@ -72,6 +74,16 @@ WSGI_APPLICATION = 'DjangoApp1.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'MySQL',
+#         'USER': 'root',
+#         'PASSWORD': 'Kmvanesa@22',
+#         'HOST': '127.0.0.1',
+#         'PORT': '3306'
+#     }
+# }
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
