@@ -4,6 +4,7 @@
         {% load bootstrap4 %}
         {% for book in object_list %}
             <div class="card col-md-4 " style="margin-bottom: 15px;">
+                <img class="img-thumbnail" src="{{ book.images.url }}" alt="Image">
                 <div class="card-body">
                     <h5 class="card-title">Title : <a href="{% url 'book_item' book.id %}">{{ book.title }}
                     </a>{% if book.seller == user and book.quantity == 0 %}

@@ -14,6 +14,7 @@ class Products(models.Model):
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     creation_date = models.DateTimeField(auto_now_add=True)
     updation_date = models.DateTimeField(auto_now=True)
+    images = models.ImageField(upload_to='images/',null=True,blank=True)
 
     def __str__(self):
         return self.title
