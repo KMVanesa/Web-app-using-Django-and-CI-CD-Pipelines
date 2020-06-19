@@ -39,9 +39,37 @@ class ProductCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
     template_name = 'books/new_book.html'
     success_message = "Books Added"
 
+    # def post(self, request, *args, **kwargs):
+    #     form_class = self.get_form_class()
+    #     form = self.get_form(form_class)
+    #     files = request.FILES.getlist('images')
+    #     if form.is_valid():
+    #         seller = request.user
+    #         isbn = form.cleaned_data['isbn']
+    #         title = form.cleaned_data['title']
+    #         authors = form.cleaned_data['authors']
+    #         publication_date = form.cleaned_data['publication_date']
+    #         quantity = form.cleaned_data['quantity']
+    #         price = form.cleaned_data['price']
+    #         for f in files:
+    #             Products.objects.create(images=f)
+    #         return self.form_valid(form)
+    #     else:
+    #         return self.form_invalid(form)
+
     def form_valid(self, form):
         form.instance.seller = self.request.user
+        Products = form.save()
+
+        Products.save()
         return super().form_valid(form)
+
+    # def form_valid(self, form):
+    #     obj = form.save(commit=False)
+    #     if self.request.FILES:
+    #         for f in self.request.FILES.getlist('images'):
+    #             obj = self.model.objects.create(images=f)
+    #     return super(ProductCreate, self).form_valid(form)
 
 
 class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin, UpdateView):

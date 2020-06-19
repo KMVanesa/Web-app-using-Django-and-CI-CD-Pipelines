@@ -19,6 +19,8 @@ from first_app import views
 from products import views as product_view
 from products.views import ProductList, ProductDetailItem, ProductCreate, ProductUpdate, ProductDelete, MyBooksList
 from django.urls import include
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,3 +44,6 @@ urlpatterns = [
     path('books/<int:pk>/update/', ProductUpdate.as_view(), name="book_update"),
     path('books/<int:pk>/delete/', ProductDelete.as_view(), name="book_delete"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
