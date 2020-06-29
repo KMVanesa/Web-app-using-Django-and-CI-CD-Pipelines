@@ -1,0 +1,44 @@
+{% extends 'first_app/base.html' %}
+{% block body_block %}
+    <div class="row">
+        {% load bootstrap4 %}
+        {% for book in object_list %}
+            {% if book.quantity > 0 %}
+
+
+            <div class="card col-md-4 " style="margin-bottom: 15px;">
+                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        {% for image in obj %}
+                            {% if image.book.title == book.title %}
+                                <div class="carousel-item active">
+                                    <img class="d-block w-100" src="{{ image.image.url }}" style="height: 400px;"
+                                         alt="Second slide">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Title : <a href="{% url 'book_item' book.id %}">{{ book.title }}
+                    </a>{% if book.seller == user and book.quantity == 0 %}
+                        <span class="badge badge-danger md-sm-2">Out of Stock !!!</span>
+                    {% elif book.seller == user %}
+                        <span class="badge badge-success md-sm-2">My Books</span>{% endif %}</h5>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Author : {{ book.authors }} </li>
+                        <li class="list-group-item">Price : ${{ book.price }}</li>
+                        <li class="list-group-item">Available Books: {{ book.quantity }}</li>
+                        <li class="list-group-item"><a href="{% url 'book_item' book.id %}" class="btn btn-primary">More
+                            Details</a></li>
+                    </ul>
+                </div>
+                <div class="card-footer text-muted">
+                    Date Added:
+                    {{ book.creation_date }}
+                </div>
+            </div>
+             {% endif %} 
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'first_app/base.html' %}
+{% load bootstrap4 %}
+{% block body_block %}
+
+    <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-primary">Go Back</a>
+    <br><br>
+    <div class="card">
+        <h5 class="card-header">{{ object.title }}</h5>
+        <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+
+            <div class="carousel-inner">
+
+                {% for image in obj %}
+                    <div class="carousel-item {% if forloop.first %} active{% endif %}">
+                        <img class="d-block w-100" src="{{ image.image.url }}" style="height: 400px;"
+                             alt="Second slide">
+                        {% if object.seller == user %}
+                            <div style="margin-left: 250px; margin-top: 20px;"><a class="btn btn-danger btn-sm mb-1"
+                                                                                  href="{% url 'delete-image' object.id image.id %}"
+                                                                                  style="margin-left:250px;">Delete
+                                Image</a></div>
+                        {% endif %}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+            <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+        <div class="card-body">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">ISBN : {{ object.isbn }} </li>
+                <li class="list-group-item">Author : {{ object.authors }} </li>
+                <li class="list-group-item">Price : ${{ object.price }}</li>
+                <li class="list-group-item">Publication Date : {{ object.publication_date }} </li>
+                <li class="list-group-item">Available Books : {{ object.quantity }}</li>
+            </ul>
+        </div>
+        {% if object.seller == user %}
+            <h5 class="card-header">Seller : {{ object.seller.first_name }}</h5>
+            <div class="card-body">
+                <a href="{% url 'book_update' object.id %}" class="card-link">Update</a>
+                <a href="{% url 'book_delete' object.id %}" class="text-danger card-link ">Delete</a>
+                <a href="{% url 'add-image' object.id %}" class="card-link ">Add Image</a>
+            </div>
+        {% else %}
+            <h5 class="card-header">Seller : {{ object.seller.first_name }}</h5>
+            <div class="card-body">
+                <a href="{{ object.get_add_to_cart_url }}" class="card-link btn btn-success">Add To Cart</a>
+            </div>
+        {% endif %}
+
+        {% if object %}
+
+        {% endif %}
+
+    </div>
+{% endblock %}

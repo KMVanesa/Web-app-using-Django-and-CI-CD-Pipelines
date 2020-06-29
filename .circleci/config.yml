@@ -1,79 +1,33 @@
-version: 2
+version: 2.1
+orbs:
+  aws-s3: circleci/aws-s3@1.0.15
+  aws-code-deploy: circleci/aws-code-deploy@1.0.1
 jobs:
   build:
     docker:
       - image: circleci/python:3.8.3
-      #   environment:
-      #     DB_DATABASE: MySQL
-      #     DB_USER: root
-      #     DB_PASSWORD: Kmvanesa@22
-      #     DB_HOST: 127.0.0.1
-      #     DB_PORT: 3306
-      # - image: circleci/mysql:8.0.20
-      #   environment:
-          # MYSQL_ALLOW_EMPTY_PASSWORD: true
-          # MYSQL_ROOT_PASSWORD: Kmvanesa@22
-          # MYSQL_DATABASE: MySQL
-          # MYSQL_USER: root
-          # MYSQL_PASSWORD: Kmvanesa@22
-          # MYSQL_HOST: 127.0.0.1
-          # MYSQL_PORT: 3306
-      - image: circleci/postgres:9.6.5-alpine-ram
-        environment:
-          POSTGRES_USER: chief_kmv
-          POSTGRES_DB: postgres
-          POSTGRES_PASSWORD: Kmvanesa
     steps:
       - checkout
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-      # - run:
-      #     command: |
-      #       for i in `seq 1 10`;
-      #       do
-      #         nc -z 127.0.0.1 3306 && echo Success && exit 0
-      #         echo -n .
-      #         sleep 1
-      #       done
-      #       echo Failed waiting for MySQL && exit 1
-      # - run:
-      #     name: Install MySQL CLI; Import dummy data; run an example query
-      #     command: |
-      #       sudo apt-get install default-mysql-client
-      #       mysql -h 127.0.0.1 -u root -Kmvanesa@22 MySQL
-      - run: sudo apt-get install postgresql-client
       - run:
-          name: Waiting for PostgreSQL to start
+          name: Zipping Files
           command: |
-            for i in `seq 1 10`;
-            do
-              nc -z localhost 5432 && echo Success && exit 0
-              echo -n .
-              sleep 2
-            done
-            echo Failed waiting for Postgres && exit 1
-      - run:
-          command: |
-            python -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-      - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-          paths:
-            - "venv"
-      # - run:
-      #     name: Setup the database
-      #     command: psql -h localhost -p 5432 -U chief_kmv -d Kmvanesa -a -f schema.sql
-      - run:
-          name: Running tests
-          command: |
-            . venv/bin/activate
-            python3 manage.py migrate auth
-            python3 manage.py makemigrations products
-            python3 manage.py makemigrations first_app
-            python3 manage.py migrate auth
-            python3 manage.py migrate
-            python3 manage.py test
-      - store_artifacts:
-          path: test-reports/
-          destination: python_app
+            pwd
+            ls -al
+            zip -r DjangoApp1.zip DjangoApp1/
+            echo "Zip Done"
+            sudo chmod 775 DjangoApp1.zip
+            ls -al
+      - aws-s3/copy:
+          from: DjangoApp1.zip
+          to: s3://codedeploy-kmvanesa-me
+workflows:
+  deploy_application:
+    jobs:
+      - build
+      - aws-code-deploy/deploy:
+          application-name: csye6225-webapp
+          bundle-bucket: codedeploy-kmvanesa-me
+          bundle-key: DjangoApp1
+          deployment-config: CodeDeployDefault.OneAtATime
+          deployment-group: csye6225-webapp-deployment
+          service-role-arn: arn:aws:iam::708581696554:roleCodeDeployServiceRole
