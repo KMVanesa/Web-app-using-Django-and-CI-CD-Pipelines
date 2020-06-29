@@ -7,6 +7,7 @@ source venv/bin/activate
 pip3 install -r DjangoApp1/requirements.txt
 sudo chown ubuntu:www-data -R /home/ubuntu/DjangoApp1/
 sudo chmod 775 -R /home/ubuntu/DjangoApp1/
+source env.sh
 python3 DjangoApp1/manage.py migrate
 python3 DjangoApp1/manage.py collectstatic -y
 sudo cp DjangoApp1/deploy/gunicorn.service /etc/systemd/system/
