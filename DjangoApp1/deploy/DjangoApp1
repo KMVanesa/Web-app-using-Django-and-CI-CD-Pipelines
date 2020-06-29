@@ -1,0 +1,14 @@
+server {
+    listen 80;
+    server_name ~^(.+)$;
+    client_max_body_size 500M;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/ubuntu/DjangoApp1;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/ubuntu/DjangoApp1/DjangoApp1.sock;
+    }
+}

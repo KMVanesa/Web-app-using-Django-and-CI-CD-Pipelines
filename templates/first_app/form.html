@@ -1,9 +1,0 @@
-{% extends 'first_app/base.html' %}
-{% block body_block %}
-    <h5>Your username and email id is {{ user.username }}</h5>
-    <form action="" method="post">
-        {{ update_form.as_p }}
-        {% csrf_token %}
-        <input type="submit" value="Submit" class="btn btn-primary">
-    </form>
-{% endblock %}
