@@ -4,6 +4,9 @@ files:
   - source: /
     destination: /home/ubuntu/
 hooks:
+  BeforeInstall:
+    - location: unload.sh
+      runas: ubuntu
   ApplicationStart:
     - location: start.sh
       runas: ubuntu

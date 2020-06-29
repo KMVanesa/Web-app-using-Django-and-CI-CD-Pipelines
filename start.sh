@@ -14,6 +14,8 @@ python3 DjangoApp1/manage.py collectstatic -y
 sudo cp DjangoApp1/deploy/gunicorn.service /etc/systemd/system/
 sudo systemctl start gunicorn
 sudo systemctl enable gunicorn
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
 sudo cp DjangoApp1/deploy/DjangoApp1 /etc/nginx/sites-available/
 sudo ln -s /etc/nginx/sites-available/DjangoApp1 /etc/nginx/sites-enabled
 sudo nginx -t && sudo systemctl restart nginx
