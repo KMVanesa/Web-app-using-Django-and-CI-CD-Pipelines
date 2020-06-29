@@ -9,6 +9,7 @@ sudo chown ubuntu:www-data -R /home/ubuntu/DjangoApp1/
 sudo chmod 775 -R /home/ubuntu/DjangoApp1/
 source env.sh
 python3 DjangoApp1/manage.py migrate
+source env.sh
 python3 DjangoApp1/manage.py collectstatic -y
 sudo cp DjangoApp1/deploy/gunicorn.service /etc/systemd/system/
 sudo systemctl start gunicorn
