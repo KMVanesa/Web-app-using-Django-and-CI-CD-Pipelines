@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-
+import logging
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -24,17 +24,14 @@ SECRET_KEY = 'fkjoe(@drnxqi(-s+ar2xo3r@*&fidos*b)c(a9-8i+car%s54'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-AWS_ACCESS_KEY_ID = os.environ['access_key']
-AWS_SECRET_ACCESS_KEY = os.environ['secret_key']
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = "public-read-write"
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_STORAGE_BUCKET_NAME = os.environ['bucket']
 
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-
+logging.basicConfig(
+        level = logging.DEBUG,
+        format = '%(name)s %(levelname)s %(message)s',
+    )
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -103,17 +100,35 @@ WSGI_APPLICATION = 'DjangoApp1.wsgi.application'
 #         "PORT": "5432",
 #     }
 # }
-host = os.environ['endpoint']
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": os.environ['db_name'],
-        "USER": os.environ['db_user'],
-        "PASSWORD": os.environ['db_pass'],
-        "HOST": host,
-        "PORT": "5432",
+if 'access_key' in os.environ:
+    AWS_ACCESS_KEY_ID = os.environ['access_key']
+    AWS_SECRET_ACCESS_KEY = os.environ['secret_key']
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_DEFAULT_ACL = "public-read-write"
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_STORAGE_BUCKET_NAME = os.environ['bucket']
+    host = os.environ['endpoint']
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": os.environ['db_name'],
+            "USER": os.environ['db_user'],
+            "PASSWORD": os.environ['db_pass'],
+            "HOST": host,
+            "PORT": "5432",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql_psycopg2",
+            "NAME": "postgres",
+            "USER": "chief_kmv",
+            "PASSWORD": "Kmvanesa",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
 
 # if 'RDS_HOSTNAME' in os.environ:
 # DATABASES = {
