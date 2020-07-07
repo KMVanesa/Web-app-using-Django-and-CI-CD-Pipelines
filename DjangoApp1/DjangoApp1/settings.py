@@ -28,10 +28,63 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
-logging.basicConfig(
-        level = logging.DEBUG,
-        format = '%(name)s %(levelname)s %(message)s',
-    )
+# logging.basicConfig(
+#         level = logging.DEBUG,
+#         format = '%(name)s %(levelname)s %(message)s',
+#     )
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'level': 'DEBUG',
+#             'class': 'logging.StreamHandler',
+#         },
+#         'logfile': {
+#             'level':'DEBUG',
+#             'class':'logging.FileHandler',
+#             'filename': BASE_DIR + "/../django.log",
+#         },
+#     },
+#     'root': {
+#         'level': 'INFO',
+#         'handlers': ['console', 'logfile']
+#     },
+# }
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR+'/../webapp.log',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(name)s %(funcName)s: %(message)s'
+            }
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'first_app': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'products': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',

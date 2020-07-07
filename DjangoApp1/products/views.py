@@ -14,7 +14,8 @@ from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import modelformset_factory
 from django.views.generic.edit import FormMixin
-
+import logging
+logger = logging.getLogger(__name__)
 
 class ProductList(ListView):
     model = Products
@@ -55,7 +56,7 @@ class ProductCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
     def form_valid(self, form):
         form.instance.seller = self.request.user
         Products = form.save()
-
+        logger.info("New Book added by user")
         Products.save()
         return super().form_valid(form)
 
@@ -71,6 +72,7 @@ class ImageAdd(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
         form.instance.book = Products.objects.get(pk=self.kwargs['pk'])
         BookImage = form.save()
         BookImage.save()
+        logger.info("New Image added by user")
         return super().form_valid(form)
 
 
@@ -82,6 +84,7 @@ class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin
 
     def test_func(self):
         book = self.get_object()
+        logger.info("Book is Updated my User")
         if self.request.user == book.seller:
             return True
         return False
@@ -91,9 +94,11 @@ class ProductDelete(LoginRequiredMixin, DeleteView):
     model = Products
     template_name = 'books/delete_book.html'
     success_url = '/books'
-
+    logger.info("Book Deleted by User")
+    
     def test_func(self):
         book = self.get_object()
+        logger.info("Book Deleted by User")
         if self.request.user == book.seller:
             return True
         return False
@@ -120,12 +125,14 @@ def BookAddToCart(request, pk):
             item.quantity -= 1
             item.save()
             messages.info(request, "The Book is added to the cart.")
+            logger.info("The Book is added to the cart.")
             return redirect("cart")
         else:
             order.items.add(cart_book)
             item.quantity -= 1
             item.save()
             messages.info(request, "The Book is added to the cart.")
+            logger.info("The Book is added to the cart.")
             return redirect("book_item", pk=pk)
     else:
         ordered_date = timezone.now()
@@ -134,6 +141,7 @@ def BookAddToCart(request, pk):
         item.quantity -= 1
         item.save()
         messages.info(request, "This item was added to your cart.")
+        logger.info("The Book is added to the cart.")
         return redirect("cart")
 
 
@@ -155,9 +163,11 @@ def RemoveAllBooks(request, pk):
             order.items.remove(cart_book)
             cart_book.delete()
             messages.info(request, "This item was removed from your cart.")
+            logger.info( "The book was removed from your cart.")
             return redirect("cart")
         else:
             messages.info(request, "This item was not in your cart")
+            logger.info( "The book was removed from your cart.")
             return redirect("book_item", pk=pk)
     else:
         messages.info(request, "You do not have an active order")
@@ -183,10 +193,12 @@ def BookRemoveFromCart(request, pk):
                 book.quantity += 1
                 book.save()
                 messages.info(request, "The Book was removed from the cart.")
+                logger.info( "The Book was removed from your cart.")
                 return redirect("cart")
             else:
                 order.items.remove(cart_book)
                 messages.info(request, "The Book was removed from the cart.")
+                logger.info("The Book was removed from your cart.")
                 book.quantity += 1
                 book.save()
                 return redirect("cart")
@@ -219,4 +231,5 @@ class ImageDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def test_func(self):
         bookimage = self.get_object()
+        logger.info( "This image was removed.")
         return True
