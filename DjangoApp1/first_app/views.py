@@ -8,7 +8,8 @@ from django.urls import reverse
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
-
+import logging
+logger = logging.getLogger(__name__)
 
 def index(request):
     # user = request.user
@@ -16,12 +17,13 @@ def index(request):
     #     print('abc')
     #     # my_data = {'user': user.first_name}
     # # users = Register.objects.order_by('first_name')
-
+    logger.info('User is here')
     return render(request, 'books/books.html', {})
 
 
 @login_required
 def user_logout(request):
+    logger.info('User logged out')
     logout(request)
     return HttpResponseRedirect(reverse('login'))
 
@@ -59,12 +61,13 @@ def register_form(request):
             raw_password = reg_form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
-
+            logger.info('User Registered in')
             registered = True
             return HttpResponseRedirect(reverse('books'))
 
         else:
             print(reg_form.errors)
+            logger.warning(reg_form.errors)
     else:
         reg_form = forms.UserForm()
     return render(request, 'first_app/registration.html', {'registered': registered, 'reg_form': reg_form})
@@ -103,10 +106,12 @@ def user_login(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
+            logger.info('User Logged in')
             return HttpResponseRedirect(reverse('books'))
         else:
             form = AuthenticationForm(request.POST)
             messages.info(request, "Invalid Credentials.")
+            logger.warning('User entered invalid credentials')
             return render(request, 'first_app/login.html', {'form': form})
     else:
         form = AuthenticationForm()

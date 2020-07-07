@@ -21,7 +21,7 @@ To set up the database.
 python manage.py migrate
 ```
 
-## Activate Local Host Server
+## Activate Host Server
 
 ```bash
 python manage.py runserver
