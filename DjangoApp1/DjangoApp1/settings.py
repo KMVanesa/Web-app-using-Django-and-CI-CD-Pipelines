@@ -24,7 +24,9 @@ SECRET_KEY = 'fkjoe(@drnxqi(-s+ar2xo3r@*&fidos*b)c(a9-8i+car%s54'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
+STATSD_HOST = '*'
+STATSD_PORT = 8125
+STATSD_PREFIX = None
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -96,7 +98,7 @@ INSTALLED_APPS = [
     'products',
     'bootstrap4',
     'storages',
-    'django_cleanup.apps.CleanupConfig'
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [

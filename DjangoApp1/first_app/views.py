@@ -10,6 +10,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 import logging
 logger = logging.getLogger(__name__)
+# from statsd.defaults.django import statsd
 
 def index(request):
     # user = request.user
