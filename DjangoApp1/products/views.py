@@ -14,8 +14,12 @@ from django import template
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import modelformset_factory
 from django.views.generic.edit import FormMixin
+
+from statsd import StatsClient
+stats = StatsClient()
 import logging
 logger = logging.getLogger(__name__)
+
 
 class ProductList(ListView):
     model = Products
@@ -35,6 +39,7 @@ class ProductDetailItem(FormMixin, DetailView):
     form_class = ImageForm
 
     def get_context_data(self, **kwargs):
+        stats.incr('books')
         context = super().get_context_data(**kwargs)
         context['obj'] = BookImage.objects.filter(book=self.object.id)
         return context
@@ -54,10 +59,13 @@ class ProductCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
     success_message = "Books Added"
 
     def form_valid(self, form):
+        timer = stats.timer('time')
+        timer.start()
         form.instance.seller = self.request.user
         Products = form.save()
         logger.info("New Book added by user")
         Products.save()
+        timer.stop()
         return super().form_valid(form)
 
 
@@ -83,8 +91,11 @@ class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin
     success_message = "Books Updated"
 
     def test_func(self):
+        timer = stats.timer('update')
+        timer.start()
         book = self.get_object()
         logger.info("Book is Updated my User")
+        timer.stop()
         if self.request.user == book.seller:
             return True
         return False
