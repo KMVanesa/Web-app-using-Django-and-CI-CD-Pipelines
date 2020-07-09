@@ -39,7 +39,7 @@ class ProductDetailItem(FormMixin, DetailView):
     form_class = ImageForm
 
     def get_context_data(self, **kwargs):
-        stats.incr('books')
+        stats.incr('book-viewed')
         context = super().get_context_data(**kwargs)
         context['obj'] = BookImage.objects.filter(book=self.object.id)
         return context
@@ -59,7 +59,7 @@ class ProductCreate(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
     success_message = "Books Added"
 
     def form_valid(self, form):
-        timer = stats.timer('time')
+        timer = stats.timer('create-book')
         timer.start()
         form.instance.seller = self.request.user
         Products = form.save()
@@ -91,7 +91,7 @@ class ProductUpdate(LoginRequiredMixin, UserPassesTestMixin, SuccessMessageMixin
     success_message = "Books Updated"
 
     def test_func(self):
-        timer = stats.timer('update')
+        timer = stats.timer('update-book')
         timer.start()
         book = self.get_object()
         logger.info("Book is Updated my User")
@@ -105,7 +105,6 @@ class ProductDelete(LoginRequiredMixin, DeleteView):
     model = Products
     template_name = 'books/delete_book.html'
     success_url = '/books'
-    logger.info("Book Deleted by User")
     
     def test_func(self):
         book = self.get_object()

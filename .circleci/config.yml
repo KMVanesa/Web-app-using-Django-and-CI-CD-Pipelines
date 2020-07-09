@@ -1,33 +1,59 @@
-version: 2.1
-orbs:
-  aws-s3: circleci/aws-s3@1.0.15
-  aws-code-deploy: circleci/aws-code-deploy@1.0.1
+version: 2
 jobs:
   build:
     docker:
       - image: circleci/python:3.8.3
+      - image: circleci/postgres:9.6.5-alpine-ram
+        environment:
+          POSTGRES_USER: chief_kmv
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: Kmvanesa
     steps:
       - checkout
+      - run: sudo apt-get install postgresql-client
       - run:
-          name: Zipping Files
+          name: Waiting for PostgreSQL to start
           command: |
-            pwd
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 2
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run:
+          command: |
+            python -m venv venv
+            . venv/bin/activate
+            cd DjangoApp1
+            pip install -r requirements.txt
+      - run:
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            cd DjangoApp1
+            python3 manage.py migrate auth
+            python3 manage.py makemigrations products
+            python3 manage.py makemigrations first_app
+            python3 manage.py migrate auth
+            python3 manage.py migrate
+            python3 manage.py test
+      - run:
+          name: Zipping Files and Install AWS-Cli
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+            sudo apt-get update -y
+            sudo apt-get install -y less
             ls -al
             zip -r DjangoApp1.zip DjangoApp1/
             echo "Zip Done"
             sudo chmod 775 DjangoApp1.zip
             ls -al
-      - aws-s3/copy:
-          from: DjangoApp1.zip
-          to: s3://codedeploy-kmvanesa-me
-workflows:
-  deploy_application:
-    jobs:
-      - build
-      - aws-code-deploy/deploy:
-          application-name: csye6225-webapp
-          bundle-bucket: codedeploy-kmvanesa-me
-          bundle-key: DjangoApp1
-          deployment-config: CodeDeployDefault.OneAtATime
-          deployment-group: csye6225-webapp-deployment
-          service-role-arn: arn:aws:iam::708581696554:roleCodeDeployServiceRole
+      - run:
+          name: Code Deployment
+          command: |
+            ls -al
+            aws s3 cp DjangoApp1.zip s3://codedeploy-kmvanesa-me
+            aws deploy create-deployment --application-name csye6225-webapp --deployment-group-name csye6225-webapp-deployment --description "CSYE6225" --region us-east-1 --s3-location bucket=codedeploy-kmvanesa-me,bundleType=zip,key=DjangoApp1.zip
