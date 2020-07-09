@@ -135,8 +135,11 @@ def profile(request):
         if request.method == 'POST':
             update_form = forms.UserUpdateForm(request.POST, instance=request.user)
             if update_form.is_valid():
+                timer = stats.timer('user-profile-updated')
+                timer.start()
                 update_form.save()
                 messages.success(request, "Account has been updated")
+                timer.stop()
                 return HttpResponseRedirect(reverse('update'))
         else:
             update_form = forms.UserUpdateForm(instance=request.user)
@@ -153,9 +156,12 @@ def change_password(request):
         if request.method == 'POST':
             form = PasswordChangeForm(data=request.POST, user=request.user)
             if form.is_valid():
+                timer = stats.timer('user-change-passwd')
+                timer.start()
                 form.save()
                 update_session_auth_hash(request, form.user)
                 messages.success(request, "Your Password has been updated!")
+                timer.stop()
                 return HttpResponseRedirect(reverse('logout'))
             else:
                 messages.info(request, "Passwords Don't Match.")
