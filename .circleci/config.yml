@@ -10,8 +10,6 @@ jobs:
           POSTGRES_PASSWORD: Kmvanesa
     steps:
       - checkout
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run: sudo apt-get install postgresql-client
       - run:
           name: Waiting for PostgreSQL to start
@@ -27,24 +25,19 @@ jobs:
           command: |
             python -m venv venv
             . venv/bin/activate
+            cd DjangoApp1
             pip install -r requirements.txt
-      - save_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-          paths:
-            - "venv"
       - run:
           name: Running tests
           command: |
             . venv/bin/activate
+            cd DjangoApp1
             python3 manage.py migrate auth
             python3 manage.py makemigrations products
             python3 manage.py makemigrations first_app
             python3 manage.py migrate auth
             python3 manage.py migrate
             python3 manage.py test
-      - store_artifacts:
-          path: test-reports/
-          destination: python_app
       - run:
           name: Zipping Files and Install AWS-Cli
           command: |
