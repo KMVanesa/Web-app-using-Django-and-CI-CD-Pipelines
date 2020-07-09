@@ -1,6 +1,4 @@
 version: 2
-orbs:
-  aws-s3: circleci/aws-s3@1.0.15
 jobs:
   build:
     docker:
@@ -48,18 +46,19 @@ jobs:
           path: test-reports/
           destination: python_app
       - run:
-          name: Zipping Files
+          name: Zipping Files and Install AWS-Cli
           command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
             pwd
             ls -al
             zip -r DjangoApp1.zip DjangoApp1/
             echo "Zip Done"
             sudo chmod 775 DjangoApp1.zip
             ls -al
-      - aws-s3/copy:
-          from: DjangoApp1.zip
-          to: s3://codedeploy-kmvanesa-me
       - run:
           name: Code Deployment
           command: |
+            aws s3 cp webapp.zip s3://codedeploy-kmvanesa-me
             aws deploy create-deployment --application-name csye6225-webapp --deployment-group-name csye6225-webapp-deployment --description "CSYE6225" --region us-east-1 --s3-location bucket=codedeploy-kmvanesa-me,bundleType=zip,key=webapp.zip
