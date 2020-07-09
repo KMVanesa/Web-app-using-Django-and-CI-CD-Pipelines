@@ -77,10 +77,13 @@ class ImageAdd(LoginRequiredMixin, SuccessMessageMixin, CreateView, ):
     success_url = '/books/'
 
     def form_valid(self, form):
+        timer = stats.timer('image-added')
+        timer.start()
         form.instance.book = Products.objects.get(pk=self.kwargs['pk'])
         BookImage = form.save()
         BookImage.save()
         logger.info("New Image added by user")
+        timer.stop()
         return super().form_valid(form)
 
 
@@ -107,8 +110,11 @@ class ProductDelete(LoginRequiredMixin, DeleteView):
     success_url = '/books'
     
     def test_func(self):
+        timer = stats.timer('product-deleted')
+        timer.start()
         book = self.get_object()
         logger.info("Book Deleted by User")
+        timer.stop()
         if self.request.user == book.seller:
             return True
         return False
@@ -130,21 +136,29 @@ def BookAddToCart(request, pk):
             if item.quantity == 0:
                 messages.info(request, "Maximum amount of book added to the cart.")
                 return redirect("cart")
+            timer = stats.timer('book-added-to-cart')
+            timer.start()
             cart_book.quantity += 1
             cart_book.save()
             item.quantity -= 1
             item.save()
             messages.info(request, "The Book is added to the cart.")
             logger.info("The Book is added to the cart.")
+            timer.stop()
             return redirect("cart")
         else:
+            timer = stats.timer('book-added-to-cart')
+            timer.start()
             order.items.add(cart_book)
             item.quantity -= 1
             item.save()
             messages.info(request, "The Book is added to the cart.")
             logger.info("The Book is added to the cart.")
+            timer.stop()
             return redirect("book_item", pk=pk)
     else:
+        timer = stats.timer('book-added-to-cart')
+        timer.start()
         ordered_date = timezone.now()
         order = Order.objects.create(user=request.user, ordered_date=ordered_date)
         order.items.add(cart_book)
@@ -152,6 +166,7 @@ def BookAddToCart(request, pk):
         item.save()
         messages.info(request, "This item was added to your cart.")
         logger.info("The Book is added to the cart.")
+        timer.stop()
         return redirect("cart")
 
 
@@ -168,12 +183,15 @@ def RemoveAllBooks(request, pk):
                 item=book,
                 user=request.user,
                 ordered=False)[0]
+            timer = stats.timer('books-removed-from-cart')
+            timer.start()
             book.quantity += cart_book.quantity
             book.save()
             order.items.remove(cart_book)
             cart_book.delete()
             messages.info(request, "This item was removed from your cart.")
             logger.info( "The book was removed from your cart.")
+            timer.stop()
             return redirect("cart")
         else:
             messages.info(request, "This item was not in your cart")
@@ -198,19 +216,25 @@ def BookRemoveFromCart(request, pk):
                 user=request.user,
                 ordered=False)[0]
             if cart_book.quantity > 1:
+                timer = stats.timer('book-removed-from-cart')
+                timer.start()
                 cart_book.quantity -= 1
                 cart_book.save()
                 book.quantity += 1
                 book.save()
                 messages.info(request, "The Book was removed from the cart.")
                 logger.info( "The Book was removed from your cart.")
+                timer.stop()
                 return redirect("cart")
             else:
+                timer = stats.timer('book-removed-from-cart')
+                timer.start()
                 order.items.remove(cart_book)
                 messages.info(request, "The Book was removed from the cart.")
                 logger.info("The Book was removed from your cart.")
                 book.quantity += 1
                 book.save()
+                timer.stop()
                 return redirect("cart")
         else:
             messages.info(request, "This item was not in your cart")
@@ -240,6 +264,9 @@ class ImageDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     success_url = '/books/'
 
     def test_func(self):
+        timer = stats.timer('image-removed')
+        timer.start()
         bookimage = self.get_object()
         logger.info( "This image was removed.")
+        timer.stop()
         return True

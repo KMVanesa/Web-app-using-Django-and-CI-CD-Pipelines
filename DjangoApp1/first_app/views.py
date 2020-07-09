@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
+from statsd import StatsClient
+stats = StatsClient()
 import logging
 logger = logging.getLogger(__name__)
 # from statsd.defaults.django import statsd
@@ -24,8 +26,11 @@ def index(request):
 
 @login_required
 def user_logout(request):
+    timer = stats.timer('user-logged-out')
+    timer.start()
     logger.info('User logged out')
     logout(request)
+    timer.stop()
     return HttpResponseRedirect(reverse('login'))
 
 
@@ -57,6 +62,8 @@ def register_form(request):
             # user = reg_form.save()
             # user.set_password(user.password)
             # user.save()
+            timer = stats.timer('user-registered')
+            timer.start()
             reg_form.save()
             username = reg_form.cleaned_data.get('username')
             raw_password = reg_form.cleaned_data.get('password1')
@@ -64,6 +71,7 @@ def register_form(request):
             login(request, user)
             logger.info('User Registered in')
             registered = True
+            timer.stop()
             return HttpResponseRedirect(reverse('books'))
 
         else:
@@ -106,8 +114,11 @@ def user_login(request):
         password = request.POST['password']
         user = authenticate(request, username=username, password=password)
         if user is not None:
+            timer = stats.timer('user-logged-in')
+            timer.start()
             login(request, user)
             logger.info('User Logged in')
+            timer.stop()
             return HttpResponseRedirect(reverse('books'))
         else:
             form = AuthenticationForm(request.POST)
@@ -124,8 +135,11 @@ def profile(request):
         if request.method == 'POST':
             update_form = forms.UserUpdateForm(request.POST, instance=request.user)
             if update_form.is_valid():
+                timer = stats.timer('user-profile-updated')
+                timer.start()
                 update_form.save()
                 messages.success(request, "Account has been updated")
+                timer.stop()
                 return HttpResponseRedirect(reverse('update'))
         else:
             update_form = forms.UserUpdateForm(instance=request.user)
@@ -142,9 +156,12 @@ def change_password(request):
         if request.method == 'POST':
             form = PasswordChangeForm(data=request.POST, user=request.user)
             if form.is_valid():
+                timer = stats.timer('user-change-passwd')
+                timer.start()
                 form.save()
                 update_session_auth_hash(request, form.user)
                 messages.success(request, "Your Password has been updated!")
+                timer.stop()
                 return HttpResponseRedirect(reverse('logout'))
             else:
                 messages.info(request, "Passwords Don't Match.")
