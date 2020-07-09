@@ -47,7 +47,7 @@ jobs:
             sudo apt-get update -y
             sudo apt-get install -y less
             ls -al
-            zip -r DjangoApp1.zip DjangoApp1/
+            zip -r DjangoApp1.zip DjangoApp1/ appspec.yml start.sh unload.sh
             echo "Zip Done"
             sudo chmod 775 DjangoApp1.zip
             ls -al
