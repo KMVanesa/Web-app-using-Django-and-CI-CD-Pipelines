@@ -53,5 +53,6 @@ jobs:
       - run:
           name: Code Deployment
           command: |
+            ls -al
             aws s3 cp DjangoApp1.zip s3://codedeploy-kmvanesa-me
             aws deploy create-deployment --application-name csye6225-webapp --deployment-group-name csye6225-webapp-deployment --description "CSYE6225" --region us-east-1 --s3-location bucket=codedeploy-kmvanesa-me,bundleType=zip,key=DjangoApp1.zip
