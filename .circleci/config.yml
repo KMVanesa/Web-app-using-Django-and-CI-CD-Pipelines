@@ -46,7 +46,6 @@ jobs:
             sudo ./aws/install
             sudo apt-get update -y
             sudo apt-get install -y less
-            pwd
             ls -al
             zip -r DjangoApp1.zip DjangoApp1/
             echo "Zip Done"
