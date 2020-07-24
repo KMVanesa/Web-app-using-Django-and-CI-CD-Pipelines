@@ -253,5 +253,5 @@ def new_password(request,email,token):
             return HttpResponseRedirect(reverse('index'))
     else:
         form = forms.SetNewPassword()
-    return render(request, 'first_app/reset_password_form.html', {'form': form})
+        return render(request, 'first_app/reset_password_form.html', {'form': form})
 
