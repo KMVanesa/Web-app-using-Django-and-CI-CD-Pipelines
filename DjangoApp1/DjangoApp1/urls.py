@@ -45,6 +45,7 @@ urlpatterns = [
     path('books/<int:pk>/add-image/', ImageAdd.as_view(), name="add-image"),
     path('books/<int:pk>/delete/', ProductDelete.as_view(), name="book_delete"),
     path('book/<int:book>/deleteimage/<int:pk>/', ImageDeleteView.as_view(), name='delete-image'),
+    path('password/<str:email>/<str:token>/', views.new_password, name='new_password')
 ]
 
 if settings.DEBUG:
