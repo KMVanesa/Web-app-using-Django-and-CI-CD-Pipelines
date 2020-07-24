@@ -199,11 +199,11 @@ def reset_password(request):
                     Message=json.dumps(msg),
                     MessageAttributes={
                     'username': {
-                        'DataType': 'string',
+                        'DataType': 'String',
                         'StringValue': username
                     },
                     'token': {
-                        'DataType': 'string',
+                        'DataType': 'String',
                         'StringValue': str(token)
                     }
                 })
