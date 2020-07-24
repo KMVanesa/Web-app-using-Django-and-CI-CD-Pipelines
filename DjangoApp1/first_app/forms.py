@@ -1,7 +1,8 @@
 from django import forms
 # from first_app.models import Register
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
+
 
 # class FormName(forms.ModelForm):
 #     # first_name = forms.CharField()
@@ -33,3 +34,11 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', ]
+
+
+class PasswordReset(PasswordResetForm):
+    username = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ['username']

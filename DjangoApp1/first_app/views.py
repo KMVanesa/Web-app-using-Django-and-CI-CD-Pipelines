@@ -2,16 +2,25 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 # from first_app.models import Register
 from . import forms
+import boto3
+import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth import update_session_auth_hash
 from statsd import StatsClient
+from django.contrib.auth import get_user_model
+Users = get_user_model()
+from django.contrib.auth.models import User
 stats = StatsClient()
 import logging
+import uuid
 logger = logging.getLogger(__name__)
+
+
 # from statsd.defaults.django import statsd
 
 def index(request):
@@ -171,3 +180,38 @@ def change_password(request):
             return render(request, 'first_app/password.html', {'form': form})
     else:
         return HttpResponseRedirect(reverse('login'))
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        form = forms.PasswordResetForm(data=request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('email')
+            if User.objects.filter(username=username).exists():
+                user1= User.objects.filter(username=username)
+                token = uuid.uuid1()
+                messages.success(request, "Your Password Reset Link in sent!")
+                client = boto3.client('sns',region_name='us-east-1')
+                msg={"username": username,"token":str(token)}
+                response = client.publish(
+                    TargetArn='arn:aws:sns:us-east-1:708581696554:user-updates-pwd',
+                    Message=json.dumps(msg),
+                    MessageAttributes={
+                    'username': {
+                        'DataType': 'String',
+                        'StringValue': username
+                    },
+                    'token': {
+                        'DataType': 'String',
+                        'StringValue': str(token)
+                    }
+                })
+            else:
+                messages.success(request, "You are not registered as a user!")
+                return HttpResponseRedirect(reverse('login'))
+            return HttpResponseRedirect(reverse('login'))
+    else:
+        form = forms.PasswordResetForm()
+        return render(request, 'first_app/reset_password.html', {'form': form})
+
