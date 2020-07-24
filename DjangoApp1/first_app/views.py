@@ -215,3 +215,43 @@ def reset_password(request):
         form = forms.PasswordResetForm()
         return render(request, 'first_app/reset_password.html', {'form': form})
 
+def new_password(request,email,token):
+    if request.method == 'POST':
+        try:
+            client = boto3.resource('dynamodb')
+            table = client.Table("csye6225")
+            response = table.scan()
+            for x,y in response.items():
+                if x=='Items':
+                    for a in y:
+                        for c,d in a.items():
+                            if c=='token' and d==token:
+                                form = forms.SetNewPassword(data=request.POST)
+                                if form.is_valid():
+                                    password1 = form.cleaned_data.get('new_password1')
+                                    password2 = form.cleaned_data.get('new_password2')
+                                    if password1 and password2:
+                                        if password1 != password2:
+                                            messages.success(request, "Your Password is mismatched!")
+                                            return render(request, 'first_app/reset_password_form.html', {'form': form})
+                                        if User.objects.filter(username=email).exists():
+                                            user= User.objects.get(username=email)
+                                            user.set_password(password2)
+                                            user.save()
+                                            messages.success(request, "Your Password is changed! Login Again !!!!")
+                                            return HttpResponseRedirect(reverse('login'))
+                                        else:
+                                            messages.success(request, "User is mismatched!")
+                                            return render(request, 'first_app/reset_password_form.html', {'form': form})
+                            else:
+                                messages.success(request, "Invalid URL !!!!! ")
+                                return HttpResponseRedirect(reverse('index'))
+        except Exception as e:
+            print(e)
+        else:
+            messages.success(request, "Invalid URL")
+            return HttpResponseRedirect(reverse('index'))
+    else:
+        form = forms.SetNewPassword()
+    return render(request, 'first_app/reset_password_form.html', {'form': form})
+

@@ -13,5 +13,6 @@ urlpatterns = [
     # path('update/', views.profile, name="update"),
     path('update_password/', views.change_password, name="password_change"),
     path('reset_password/', views.reset_password, name="password_reset"),
-
 ]
+
+# path('custom_page/<str:id1>/<str:id2>/', views.custom_page, name='custom_page')

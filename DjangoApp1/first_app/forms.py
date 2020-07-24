@@ -1,7 +1,7 @@
 from django import forms
 # from first_app.models import Register
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
+from django.contrib.auth.forms import UserCreationForm, PasswordResetForm, SetPasswordForm
 
 
 # class FormName(forms.ModelForm):
@@ -42,3 +42,15 @@ class PasswordReset(PasswordResetForm):
     class Meta:
         model = User
         fields = ['username']
+
+class SetNewPassword(forms.Form):
+    new_password1 = forms.CharField(
+        label= ("New password"),
+        widget=forms.PasswordInput,
+        strip=False,
+    )
+    new_password2 = forms.CharField(
+        label= ("New password confirmation"),
+        strip=False,
+        widget=forms.PasswordInput,
+    )
