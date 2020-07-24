@@ -204,7 +204,7 @@ def reset_password(request):
                     },
                     'token': {
                         'DataType': 'string',
-                        'StringValue': token
+                        'StringValue': str(token)
                     }
                 })
             else:
