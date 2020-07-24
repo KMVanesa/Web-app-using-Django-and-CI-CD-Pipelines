@@ -193,7 +193,7 @@ def reset_password(request):
                 token = uuid.uuid1()
                 messages.success(request, "Your Password Reset Link in sent!")
                 client = boto3.client('sns',region_name='us-east-1')
-                msg={'username': username,'token':str(token)}
+                msg={"username": username,"token":str(token)}
                 response = client.publish(
                     TargetArn='arn:aws:sns:us-east-1:708581696554:user-updates-pwd',
                     Message=json.dumps(msg),
