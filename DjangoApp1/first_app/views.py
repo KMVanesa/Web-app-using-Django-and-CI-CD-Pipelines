@@ -197,7 +197,16 @@ def reset_password(request):
                 response = client.publish(
                     TargetArn='arn:aws:sns:us-east-1:708581696554:user-updates-pwd',
                     Message=json.dumps(msg),
-                )
+                    MessageAttributes={
+                    'username': {
+                        'DataType': 'string',
+                        'StringValue': username
+                    },
+                    'token': {
+                        'DataType': 'string',
+                        'StringValue': token
+                    }
+                })
             else:
                 messages.success(request, "You are not registered as a user!")
                 return HttpResponseRedirect(reverse('login'))
