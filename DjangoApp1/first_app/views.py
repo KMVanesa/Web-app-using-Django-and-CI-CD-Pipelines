@@ -235,5 +235,5 @@ def new_password(request,email,token):
                     return render(request, 'first_app/reset_password_form.html', {'form': form})
     else:
         form = forms.SetNewPassword()
-    return render(request, 'first_app/reset_password_form.html', {'form': form})
+        return render(request, 'first_app/reset_password_form.html', {'form': form})
 
