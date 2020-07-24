@@ -217,6 +217,7 @@ def reset_password(request):
 
 def new_password(request,email,token):
     if request.method == 'POST':
+        form = forms.SetNewPassword(data=request.POST)
         if form.is_valid():
             password1 = form.cleaned_data.get('new_password1')
             password2 = form.cleaned_data.get('new_password2')
